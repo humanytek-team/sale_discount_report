@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_sale_order_document_discount" inherit_id="sale.report_saleorder_document">
+
+        <xpath expr="//t[@t-foreach='doc._get_tax_amount_by_group()']" position="after">
+            <tr class="border-black">
+                <td><strong>Total Global Discount</strong></td>
+                <td class="text-right">
+                    <span t-field="doc.amount_discount"/>
+                </td>
+            </tr>
+        </xpath>
+
+    </template>
+
+</odoo>
