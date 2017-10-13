@@ -20,21 +20,4 @@
 #
 ###############################################################################
 
-{
-    'name': "Sale Discount Report",
-    'summary': """
-    """,
-    'description': """
-    """,
-    'author': "Humanytek",
-    'website': "http://www.humanytek.com",
-    'category': 'Manufacturing',
-    'version': '1.0.0',
-    'depends': ['sale_global_discount'],
-    'data': [
-        'report/sale_discount_report_template.xml',
-        'view/sale_order_discount.xml'
-    ],
-    'demo': [
-    ],
-}
+import sale_order_discount

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record model="ir.ui.view" id="sale_global_discount_sale_order_subtotal">
+        <field name="name">sale_global_discount.subtotal.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_global_discount.sale_global_discount_sale_order"/>
+        <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_discount']" position="after">
+                    <field name="amount_subtotal" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                </xpath>
+        </field>
+    </record>
+
+</odoo>
