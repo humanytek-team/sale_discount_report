@@ -21,3 +21,4 @@
 ###############################################################################
 
 import sale_order_discount
+import account_invoice

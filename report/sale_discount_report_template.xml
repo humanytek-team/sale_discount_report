@@ -3,13 +3,22 @@
 
     <template id="report_sale_order_document_discount" inherit_id="sale.report_saleorder_document">
 
-        <xpath expr="//t[@t-foreach='doc._get_tax_amount_by_group()']" position="after">
+        <xpath expr="//t[@t-foreach='doc._get_tax_amount_by_group()']" position="before">
             <tr class="border-black">
                 <td><strong>Total Global Discount</strong></td>
                 <td class="text-right">
                     <span t-field="doc.amount_discount"/>
                 </td>
             </tr>
+            <tr class="border-black">
+                <td><strong>Subtotal</strong></td>
+                <td class="text-right">
+                    <span t-field="doc.amount_subtotal"/>
+                </td>
+            </tr>
+        </xpath>
+        <xpath expr="//span[@t-esc='amount_by_group[1]']" position="replace">
+            <span t-esc="amount_by_group[1]-(amount_by_group[1] * doc.discount_rate/100)" t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
         </xpath>
 
     </template>

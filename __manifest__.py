@@ -28,12 +28,14 @@
     """,
     'author': "Humanytek",
     'website': "http://www.humanytek.com",
-    'category': 'Manufacturing',
+    'category': 'Sale',
     'version': '1.0.0',
     'depends': ['sale_global_discount'],
     'data': [
+        'view/sale_order_discount.xml',
+        'view/account_invoice.xml',
         'report/sale_discount_report_template.xml',
-        'view/sale_order_discount.xml'
+        'report/invoice_discount_report_template.xml',
     ],
     'demo': [
     ],
