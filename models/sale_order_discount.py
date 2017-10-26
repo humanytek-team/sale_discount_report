@@ -50,8 +50,8 @@ class Sale_order_discount(models.Model):
                 amount_untaxed += line.price_subtotal
                 amount_tax += line.price_tax
             amount_discount = amount_untaxed * self.discount_rate / 100
-            if self.discount_rate > 0:
-                amount_tax = amount_tax - amount_tax * self.discount_rate / 100
+            #if self.discount_rate > 0:
+            amount_tax = amount_tax - amount_tax * self.discount_rate / 100
         order.update({
                 'amount_untaxed': amount_untaxed,
                 'amount_tax': amount_tax,

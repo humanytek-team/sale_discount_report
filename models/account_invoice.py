@@ -31,18 +31,20 @@ _logger = logging.getLogger(__name__)
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    amount_subtotal = fields.Float('Subtotal', store=True, readonly=True,
+    amount_subtotal = fields.Float('Subtotal', store=False, readonly=True,
                                     compute='_compute_amount',
                                     track_visibility='onchange',
                                     digits=dp.get_precision('Product Price 2'))
 
     @api.one
-    @api.depends('discount_type','discount_rate','amount_total')
+    @api.depends('discount_type','discount_rate', )
     def _compute_discount(self):
         amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         amount_discount = amount_untaxed * self.discount_rate / 100
         amount_tax = sum(line.amount for line in self.tax_line_ids)
         #amount_tax = amount_tax - amount_tax * self.discount_rate / 100
+        _logger.info('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
+        _logger.info(amount_tax)
         self.amount_untaxed = amount_untaxed
         self.amount_discount = amount_discount
         self.amount_tax = amount_tax
@@ -53,6 +55,8 @@ class AccountInvoice(models.Model):
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id', 'date_invoice', 'type')
     def _compute_amount(self):
         #self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
+        _logger.info('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        #_logger.info(amount_tax)
         amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         amount_discount = amount_untaxed * self.discount_rate / 100
         amount_tax = sum(line.amount for line in self.tax_line_ids)
@@ -116,13 +120,8 @@ class AccountInvoice(models.Model):
             for tax in taxes:
                 val = self._prepare_tax_line_vals(line, tax)
                 key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
-                _logger.info('ssssssssssssssssssssssssssssssssssssssssssssssssssss')
-                _logger.info(val)
                 if val['amount']:
-                    _logger.info('ffffffffffffffffffffffffffffffffffffffffffff')
-                    _logger.info(self.discount_rate)
-                    _logger.info(val['amount'])
-                    val['amount'] = val['amount'] * (1 - (self.discount_rate or 0.0) / 100.0)
+                    val['amount'] = val['amount']
                     _logger.info(val['amount'])
                 if key not in tax_grouped:
                     tax_grouped[key] = val
