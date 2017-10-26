@@ -38,28 +38,6 @@ class Sale_order_discount(models.Model):
                                     track_visibility='onchange',
                                     digits=dp.get_precision('Product Price 2'))
 
-    #@api.depends('discount_type', 'discount_rate', 'amount_total', 'amount_tax')
-    #def _compute_discount(self):
-        #amount_discount = 0.0
-        #amount_tax = 0.0
-        #amount_untaxed = 0.0
-        ##amount_discount = self.amount_untaxed * self.discount_rate / 100
-        ##self.amount_discount = amount_discount
-        ##self.amount_subtotal = self.amount_untaxed - amount_discount
-        #for order in self:
-            #amount_tax = 0.0
-            #for line in order.order_line:
-                #amount_untaxed += line.price_subtotal
-                #amount_tax += line.price_tax
-            #if self.discount_rate > 0:
-                    #amount_tax = amount_tax - amount_tax * self.discount_rate / 100
-            #self.amount_tax = amount_tax
-            #amount_discount = amount_untaxed * self.discount_rate / 100
-            #self.amount_discount = amount_discount
-
-            #self.amount_subtotal = amount_untaxed - amount_discount
-            #self.amount_total = amount_untaxed - amount_discount + amount_tax
-
     @api.multi
     def _amount_all(self):
         """

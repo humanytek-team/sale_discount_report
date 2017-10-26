@@ -22,6 +22,10 @@
 
 from odoo import fields, models, api
 from odoo.addons import decimal_precision as dp
+from odoo.tools import float_is_zero
+import logging
+_logger = logging.getLogger(__name__)
+
 
 
 class AccountInvoice(models.Model):
@@ -38,7 +42,7 @@ class AccountInvoice(models.Model):
         amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         amount_discount = amount_untaxed * self.discount_rate / 100
         amount_tax = sum(line.amount for line in self.tax_line_ids)
-        amount_tax = amount_tax - amount_tax * self.discount_rate / 100
+        #amount_tax = amount_tax - amount_tax * self.discount_rate / 100
         self.amount_untaxed = amount_untaxed
         self.amount_discount = amount_discount
         self.amount_tax = amount_tax
@@ -52,7 +56,7 @@ class AccountInvoice(models.Model):
         amount_untaxed = sum(line.price_subtotal for line in self.invoice_line_ids)
         amount_discount = amount_untaxed * self.discount_rate / 100
         amount_tax = sum(line.amount for line in self.tax_line_ids)
-        amount_tax = amount_tax - amount_tax * self.discount_rate / 100
+        #amount_tax = amount_tax - amount_tax * self.discount_rate / 100
         self.amount_untaxed = amount_untaxed
         self.amount_discount = amount_discount
         self.amount_tax = amount_tax
@@ -71,3 +75,58 @@ class AccountInvoice(models.Model):
         self.amount_total_company_signed = amount_total_company_signed * sign
         self.amount_total_signed = self.amount_total * sign
         self.amount_untaxed_signed = amount_untaxed_signed * sign
+
+    #@api.one
+    #@api.depends(
+        #'state', 'currency_id', 'invoice_line_ids.price_subtotal',
+        #'move_id.line_ids.amount_residual',
+        #'move_id.line_ids.currency_id')
+    #def _compute_residual(self):
+        #residual = 0.0
+        #residual_company_signed = 0.0
+        #sign = self.type in ['in_refund', 'out_refund'] and -1 or 1
+        #for line in self.sudo().move_id.line_ids:
+            #if line.account_id.internal_type in ('receivable', 'payable'):
+                #residual_company_signed += line.amount_residual
+                #if line.currency_id == self.currency_id:
+                    #residual += line.amount_residual_currency if line.currency_id else line.amount_residual
+                #else:
+                    #from_currency = (line.currency_id and line.currency_id.with_context(date=line.date)) or line.company_id.currency_id.with_context(date=line.date)
+                    #residual += from_currency.compute(line.amount_residual, self.currency_id)
+
+        #amount_tax = 0
+        #amount_tax = sum(line1.amount for line1 in self.tax_line_ids)
+        #discount_amount_tax = amount_tax * self.discount_rate / 100
+        #self.residual_company_signed = abs(residual_company_signed) * sign - self.amount_discount - discount_amount_tax
+        #self.residual_signed = abs(residual) * sign - self.amount_discount - discount_amount_tax
+        #self.residual = abs(residual) - self.amount_discount - discount_amount_tax
+        #digits_rounding_precision = self.currency_id.rounding
+        #if float_is_zero(self.residual, precision_rounding=digits_rounding_precision):
+            #self.reconciled = True
+        #else:
+            #self.reconciled = False
+
+    @api.multi
+    def get_taxes_values(self):
+        tax_grouped = {}
+        for line in self.invoice_line_ids:
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0) * (1 - (self.discount_rate or 0.0) / 100.0)
+            #price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
+            for tax in taxes:
+                val = self._prepare_tax_line_vals(line, tax)
+                key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
+                _logger.info('ssssssssssssssssssssssssssssssssssssssssssssssssssss')
+                _logger.info(val)
+                if val['amount']:
+                    _logger.info('ffffffffffffffffffffffffffffffffffffffffffff')
+                    _logger.info(self.discount_rate)
+                    _logger.info(val['amount'])
+                    val['amount'] = val['amount'] * (1 - (self.discount_rate or 0.0) / 100.0)
+                    _logger.info(val['amount'])
+                if key not in tax_grouped:
+                    tax_grouped[key] = val
+                else:
+                    tax_grouped[key]['amount'] += val['amount']
+                    tax_grouped[key]['base'] += val['base']
+        return tax_grouped
