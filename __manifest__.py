@@ -34,8 +34,8 @@
     'data': [
         'view/sale_order_discount.xml',
         'view/account_invoice.xml',
-        'report/sale_discount_report_template.xml',
-        'report/invoice_discount_report_template.xml',
+        #'report/sale_discount_report_template.xml',
+        #'report/invoice_discount_report_template.xml',
     ],
     'demo': [
     ],
