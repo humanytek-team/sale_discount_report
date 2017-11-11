@@ -43,7 +43,7 @@ class Sale_order_discount(models.Model):
         """
         Compute the total amounts of the SO.
         """
-
+        self.ensure_one()
         for order in self:
             amount_untaxed = amount_tax = amount_discount = 0.0
             for line in order.order_line:
